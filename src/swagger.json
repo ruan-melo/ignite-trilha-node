@@ -1,9 +1,9 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "RentalX API",
+        "title": "RentX API",
         "version": "1.0.0",
-        "description": "This is an API for the RentalX application.",
+        "description": "This is an API for the RentX application.",
         "contact": {
             "email": "ruantmelo@gmail.com"
         }
@@ -73,7 +73,7 @@
                                                 "type": "string"
                                             },
                                             "createdAt": {
-                                                "type": 	
+                                                "type": "string",	
                                                 "format": "date-time"
                                             },
                                             "updatedAt": {
@@ -88,7 +88,78 @@
                         }
                     }
                 }
+        },
+        "/categories/import": {
+            "post": {
+                "tags": [ "Category" ],
+                "summary": "Upload new categories", 
+                "description": "Upload new categories",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                }
+                               
+                            }
+                        }
+                    }
+                    
+                },
+                "responses": {
+                    "201": {    
+                        "description": "Successful operation"
+                    }
+                }
+            }
+            
+        },
+        "/specifications": {
+            "post": {
+                "tags": [
+                    "Specification"
+                ],
+                "summary": "Create a specification",
+                "description": "Create a new specification",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/definitions/Specification"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Specification created"
+                    },
+                    "500": {
+                        "description": "Specification already exists"
+                    }
+                }
             }
         }
-
+    },
+    "definitions": {
+        "Specification": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Specification 1"
+                },
+                "description": {
+                    "type": "string",
+                    "example": "This is a specification"
+                }
+            }
+        }
     }
+}

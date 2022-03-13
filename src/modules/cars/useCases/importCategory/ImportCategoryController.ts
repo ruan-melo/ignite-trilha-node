@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
+import { container } from "tsyringe";
 
+import { AppError } from "../../../../errors/AppErrors";
 import { ImportCategoryUseCase } from "./ImportCategoryUseCase";
 
 export class ImportCategoryController {
-    constructor(private importCategoryUseCase: ImportCategoryUseCase) {}
-
-    handle(request: Request, response: Response): Response {
+    async handle(request: Request, response: Response): Promise<Response> {
         const { file } = request;
-
+        const importCategoryUseCase = container.resolve(ImportCategoryUseCase);
         if (!file) {
-            return response.status(400).send("No file");
+            throw new AppError("No file");
         }
-        this.importCategoryUseCase.execute(file);
+        await importCategoryUseCase.execute(file);
 
-        return response.send();
+        return response.status(201).send();
     }
 }

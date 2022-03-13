@@ -1,48 +1,38 @@
-import { Specification } from "../../models/Specification";
+import { getRepository, Repository } from "typeorm";
+
+import { Specification } from "../../entities/Specification";
 import {
     ICreateSpecificationDTO,
     ISpecificationsRepository,
 } from "../ISpecificationsRepository";
 
 export class SpecificationsRepository implements ISpecificationsRepository {
-    private specifications: Specification[];
+    private repository: Repository<Specification>;
 
-    // eslint-disable-next-line no-use-before-define
-    private static INSTANCE: SpecificationsRepository;
-
-    constructor() {
-        this.specifications = [];
+    public constructor() {
+        this.repository = getRepository(Specification);
     }
 
-    public static getInstance(): SpecificationsRepository {
-        if (!SpecificationsRepository.INSTANCE) {
-            SpecificationsRepository.INSTANCE = new SpecificationsRepository();
-        }
+    async create({
+        name,
+        description,
+    }: ICreateSpecificationDTO): Promise<Specification> {
+        const specification = this.repository.create({ name, description });
 
-        return SpecificationsRepository.INSTANCE;
-    }
-
-    create({ name, description }: ICreateSpecificationDTO): Specification {
-        const specification = new Specification();
-
-        Object.assign(specification, {
-            name,
-            description,
-            created_at: new Date(),
-        });
-
-        this.specifications.push(specification);
+        await this.repository.save(specification);
 
         return specification;
     }
 
-    findByName(name: string): Specification | undefined {
-        return this.specifications.find(
-            (specification) => specification.name === name
-        );
+    async findByName(name: string): Promise<Specification | undefined> {
+        const specification = await this.repository.findOne({
+            where: { name },
+        });
+        return specification;
     }
 
-    list(): Specification[] {
-        return this.specifications;
+    async list(): Promise<Specification[]> {
+        const specifications = await this.repository.find();
+        return specifications;
     }
 }

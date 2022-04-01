@@ -15,6 +15,7 @@ import swaggerFile from "../../../swagger.json";
 import { rateLimiter } from "./middlewares/rateLimiter";
 import { routes } from "./routes";
 
+console.log("APP");
 createConnection();
 const app = express();
 

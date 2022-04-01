@@ -1,23 +1,24 @@
 import "reflect-metadata";
 import "dotenv/config";
 
-import "../../container";
-import "../../container/providers";
-
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import "express-async-errors";
 import swaggerUI from "swagger-ui-express";
 
+import "@shared/container";
 import upload from "@config/upload";
 import { AppError } from "@shared/errors/AppErrors";
+import createConnection from "@shared/infra/typeorm";
 
 import swaggerFile from "../../../swagger.json";
-import createConnection from "../typeorm";
+import { rateLimiter } from "./middlewares/rateLimiter";
 import { routes } from "./routes";
 
 createConnection();
 const app = express();
+
+app.use(rateLimiter);
 
 app.use(express.json());
 
@@ -29,11 +30,6 @@ app.use("/cars", express.static(`${upload.tmpFolder}/cars`));
 app.use(cors());
 app.use(routes);
 app.get("/", (req, res) => res.json({ message: "Hello World" }));
-
-app.post("/courses", (request, response) => {
-    const { name } = request.body;
-    return response.json({ name });
-});
 
 app.use(
     (err: Error, request: Request, response: Response, next: NextFunction) => {
